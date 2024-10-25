@@ -3,6 +3,7 @@ from tkinter import filedialog, Text
 import google.generativeai as genai
 import os
 
+# Configure the API key
 genai.configure(api_key=os.environ["API_KEY"])
 
 def process_file():
@@ -13,27 +14,26 @@ def process_file():
         with open(file_path, 'r', encoding='utf-8') as file:
             input_text = file.read()
 
-        prompt = """Correct, improve, add if missing the follow requirements, and add certain emojis to the improvements, and translate to english if necessary. Follwow this syntax:
-        **Requisito 3:** O sistema deve permitir a exportação de relatórios em formato PDF e Excel.
+        prompt = """Correct, improve, add if missing the following requirements, and add certain emojis to the improvements, and translate to English if necessary. Follow this syntax:
+        **Requirement 3:** The system must allow the export of reports in PDF and Excel format.
 
-        **Comentários:**
+        **Comments:**
 
-        * ✅ Este requisito está bem definido e claro.
-        * 🔒 "Previamente registados" foi adicionado para maior clareza.
+        * ✅ This requirement is well-defined and clear.
+        * 🔒 "Previously registered" was added for greater clarity.
         
-        
-        **Considerações Adicionais:**
+        **Additional Considerations:**
 
-        * **Especificações Detalhadas:** Os requisitos podem ser enriquecidos com mais detalhes, como por exemplo, a funcionalidade específica de pesquisa (por exemplo, se a pesquisa é por correspondência exata ou por palavras-chave).
-        * **Priorização:** É importante definir a prioridade de cada requisito para que a equipa de desenvolvimento possa focar-se nas funcionalidades mais importantes.
-        * **Teste:** Para cada requisito, devem ser definidos cenários de teste que garantam que a funcionalidade está a funcionar como esperado.
+        * **Detailed Specifications:** Requirements can be enriched with more details, such as the specific functionality of search (for example, whether the search is for exact matches or keywords).
+        * **Prioritization:** It is important to define the priority of each requirement so that the development team can focus on the most important features.
+        * **Testing:** For each requirement, test scenarios should be defined to ensure that the functionality works as expected.
 
 
-        **Melhorias no geral:**
+        **General Improvements:**
 
-        * Linguagem mais clara e concisa;
-        * Maior precisão na definição dos requisitos;
-        * Consideração por detalhes importantes.
+        * Clearer and more concise language;
+        * Greater accuracy in defining requirements;
+        * Consideration of important details.
         \n\n""" + input_text
 
         model = genai.GenerativeModel("gemini-1.5-flash")
@@ -45,13 +45,20 @@ def process_file():
         with open("output.md", 'w', encoding='utf-8') as output_file:
             output_file.write(response.text)
 
+# Create the main application window
 root = tk.Tk()
 root.title("OptiReq")
 
-upload_btn = tk.Button(root, text="Carregar Ficheiro .txt", padx=10, pady=5, fg="white", bg="blue", command=process_file)
-upload_btn.pack()
+# Set the size of the window
+root.geometry("550x700")  # l x h
 
-result_text = Text(root, height=10, width=50)
-result_text.pack()
+# Button to select the file
+upload_btn = tk.Button(root, text="Load .txt File", padx=10, pady=5, fg="white", bg="blue", command=process_file)
+upload_btn.pack(pady=10)  # Add some vertical space around the button
 
+# Text area to display the result of the API
+result_text = Text(root, height=45, width=65)  # Adjust dimensions to fit a mobile-like screen
+result_text.pack(padx=10, pady=10)  # Add padding around the text area
+
+# Start the application
 root.mainloop()
