@@ -2,9 +2,30 @@ import tkinter as tk
 from tkinter import filedialog, Text
 import google.generativeai as genai
 import os
+from markdown import Markdown
+from io import StringIO
 
 # Configure the API key
 genai.configure(api_key=os.environ["API_KEY"])
+
+def unmark_element(element, stream=None):
+    if stream is None:
+        stream = StringIO()
+    if element.text:
+        stream.write(element.text)
+    for sub in element:
+        unmark_element(sub, stream)
+    if element.tail:
+        stream.write(element.tail)
+    return stream.getvalue()
+
+Markdown.output_formats["plain"] = unmark_element
+__md = Markdown(output_format="plain")
+__md.stripTopLevelTags = False
+
+
+def unmark(text):
+    return __md.convert(text)
 
 def process_file():
     file_path = filedialog.askopenfilename(
@@ -38,12 +59,17 @@ def process_file():
 
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(prompt)
+
+        txt_response = unmark(response.text)
         
         result_text.delete(1.0, tk.END)
-        result_text.insert(tk.END, response.text)
+        result_text.insert(tk.END, txt_response)
         
         with open("output.md", 'w', encoding='utf-8') as output_file:
             output_file.write(response.text)
+        
+        with open("output.txt", 'w', encoding='utf-8') as output_file:
+            output_file.write(txt_response)
 
 # Create the main application window
 root = tk.Tk()
@@ -62,3 +88,4 @@ result_text.pack(padx=10, pady=10)  # Add padding around the text area
 
 # Start the application
 root.mainloop()
+
