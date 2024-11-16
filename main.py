@@ -35,7 +35,9 @@ def process_file():
         with open(file_path, 'r', encoding='utf-8') as file:
             input_text = file.read()
 
-        prompt = """Correct, improve, add if missing the following requirements, and add certain emojis to the improvements, and translate to English if necessary. Follow this syntax:
+        prompt = """Correct, improve, add if missing the following requirements, and add certain emojis to the improvements, and translate to English if necessary. 
+        Sort them by order of difficulty from easier to harder. In case the requirement is too complex, separate them in different requirements while maintaining its initial goal.
+        Follow this syntax:
         **Requirement 3:** The system must allow the export of reports in PDF and Excel format.
 
         **Comments:**
