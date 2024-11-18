@@ -1,0 +1,82 @@
+<html>
+  <head>
+    <style type="text/css">
+      body {
+        background: black;
+        color: white;
+        font-family: 'Arial', sans-serif;
+        padding: 50px;
+      }
+
+      .container {
+        display: flex;
+        align-items: center;
+      }
+
+      .left {
+        flex: 1;
+        margin-right: 20px;
+        text-align: center;
+      }
+
+      .right {
+        flex: 1;
+        text-align: center;
+      }
+      
+      h1 {
+        font-size: 50px;
+        text-align: center;
+      }
+
+      #file, #confirm {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      #confirm:hover {
+        background: #333;
+        color: white;
+      }
+
+      #confirm:active {
+        background: #555;
+      }
+    </style>
+  </head>
+  <script>
+    async function uploadFile(event) {
+      event.preventDefault();
+      const formData = new FormData();
+      const fileInput = document.getElementById('file');
+      formData.append('file', fileInput.files[0]);
+
+      const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      document.getElementById('output').value = result.output;
+    }
+  </script>
+  <body>
+    <h1>OptiReq</h1>
+    <div class="container">
+      <div class="left">
+        <h2>Upload a file</h2>
+        <form onsubmit="uploadFile(event)">
+          <input type="file" id="file" name="file" />
+          <button type="submit" id="confirm">Confirm</button>
+        </form>
+    </div>
+    <div class="right">
+      <h2>Output</h2>
+      <textarea id="output" cols="80" rows="30"></textarea>
+    </div>
+</html>
