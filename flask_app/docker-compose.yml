@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    image: luiscarlos21/optireq:1.0.0
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - API_KEY=AIzaSyBacc1rtDsRCpYi6O3BAtPsQpd8nfPCmUM
+    volumes:
+      - .:/app  # Mounts the current directory to /app in the container
+    restart: always
