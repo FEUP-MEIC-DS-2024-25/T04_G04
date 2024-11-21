@@ -24,7 +24,7 @@ docker run -d -p 5000:5000 -e API_KEY=your_api_key luiscarlos21/optireq:1.0.0
 ```
 
 ## Build and run the Docker container to apply recent code changes
-# Rebuilds the image and restarts the container to reflect new changes in your codebase
+### Rebuilds the image and restarts the container to reflect new changes in your codebase
 ```sh
 docker-compose up
 ```
