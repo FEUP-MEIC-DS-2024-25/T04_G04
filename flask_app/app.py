@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, send_file
 import google.generativeai as genai
 from markdown import Markdown
 from io import StringIO
@@ -44,6 +44,7 @@ def upload():
 
         prompt = """Correct, improve, add if missing the following requirements, and add certain emojis to the improvements, and translate to English if necessary. 
         Sort them by order of difficulty from easier to harder. In case the requirement is too complex, separate them in different requirements while maintaining its initial goal.
+        Add some spacing between the requirements.
         Follow this syntax:
         **Requirement 3:** The system must allow the export of reports in PDF and Excel format.
 
@@ -79,6 +80,9 @@ def upload():
         
         return jsonify({'output': txt_response})
 
+@app.route('/download')
+def download():
+    return send_file('output.md', as_attachment=True)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
