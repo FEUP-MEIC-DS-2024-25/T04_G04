@@ -23,6 +23,13 @@ Run the Docker container with your API key as an environment variable. Replace `
 docker run -d -p 5000:5000 -e API_KEY=your_api_key luiscarlos21/optireq:1.0.0
 ```
 
+## Build and run the Docker container to apply recent code changes
+
+```sh
+docker-compose up
+```
+If doesn't work try adding --build
+
 ## Access the Application
 
 Access the Flask application by navigating to http://localhost:5000 in your web browser.
