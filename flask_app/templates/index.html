@@ -62,6 +62,25 @@
           display: none;
       }
 
+      #chat-box {
+      background: #222;
+      color: white;
+      font-size: 14px;
+      line-height: 1.6;
+      }
+
+      #chat-box .message {
+        margin-bottom: 10px;
+      }
+
+      #chat-box .user {
+        color: #ffffff;
+      }
+
+      #chat-box .ai {
+        color: #ffffff;
+      }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
     <script>
@@ -83,22 +102,64 @@
         document.getElementById('output').value = outputMarkdown;
         document.getElementById('download').setAttribute('class', 'button');
       }
+
+      async function sendMessage(event) {
+        event.preventDefault();
+
+        const chatInput = document.getElementById('chat-input');
+        const message = chatInput.value.trim();
+
+        if (!message) return;
+
+        // Append user message to the chat box
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML += `<div class="message user"><strong>You:</strong> ${message}</div>`;
+        chatInput.value = '';
+
+        // Scroll to the bottom of the chat box
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Send the message to the server
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        });
+
+        const result = await response.json();
+
+        if (result.response) {
+          // Append AI response to the chat box
+          chatBox.innerHTML += `<div class="message ai"><strong>AI:</strong> ${result.response}</div>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        } else {
+          chatBox.innerHTML += `<div class="message error"><strong>Error:</strong> Failed to get a response from the AI.</div>`;
+        }
+      }
     </script>
   </head>
   <body>
     <h1>OptiReq</h1>
     <div class="container">
       <div class="left">
-        <h2>Upload a file</h2>
-        <form onsubmit="uploadFile(event)">
-          <input type="file" id="file" name="file" />
-          <button type="submit" id="confirm">Confirm</button>
+        <h2>Chat with AI</h2>
+        <div id="chat-box" style="height: 300px; overflow-y: auto; background: #222; padding: 10px; border-radius: 5px; margin-bottom: 10px;"></div>
+        <form id="chat-form" onsubmit="sendMessage(event)">
+          <input type="text" id="chat-input" placeholder="Type your message..." style="width: 80%; padding: 10px; border: 1px solid #444; border-radius: 5px;">
+          <button type="submit" id="send-chat" style="padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Send</button>
         </form>
       </div>
       <div class="right">
         <h2>File Preview</h2>
         <textarea id="output" readonly></textarea>
-        <button id="download" class="invisible button" onclick="window.location.href='/download'">Download File</button>
+        <div style="margin-top: 20px;">
+          <form onsubmit="uploadFile(event)">
+            <input type="file" id="file" name="file" />
+            <button type="submit" id="confirm">Confirm</button>
+          </form>
+          <button id="download" class="invisible button" onclick="window.location.href='/download'">Download File</button>
+        </div>
       </div>
     </div>
   </body>

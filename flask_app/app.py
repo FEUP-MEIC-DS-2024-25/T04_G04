@@ -80,6 +80,24 @@ def upload():
         
         return jsonify({'output': txt_response})
 
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    # Extract the user message from the POST request
+    user_message = request.json.get('message')
+
+    if not user_message:
+        return jsonify({'error': 'No message provided'}), 400
+
+    # Construct the AI prompt
+    prompt = f"You are an AI assistant for Requeriments engeneering. Please respond to the following: {user_message}"
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
+
+    ai_response = unmark(response.text)
+    return jsonify({'response': ai_response})
+
 @app.route('/download')
 def download():
     return send_file('output.md', as_attachment=True)
