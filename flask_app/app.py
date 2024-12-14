@@ -1,9 +1,45 @@
 import os
 from flask import Flask, request, render_template, jsonify, send_file
 import google.generativeai as genai
+from google.cloud import secretmanager, firestore
 from markdown import Markdown
 from io import StringIO
 
+app = Flask(__name__)
+
+def get_secret(secret_id):
+    client = secretmanager.SecretManagerServiceClient()
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+    secret_name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+    response = client.access_secret_version(name=secret_name)
+    return response.payload.data.decode("UTF-8")
+
+# Retrieve the API key from Secret Manager
+#api_key = get_secret("OPTI_REQ_API_KEY")
+
+if not os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "superhero-04-04.json"
+
+os.environ["ASSISTANT_ID"] = "superhero-04-04"
+
+db = firestore.Client()
+
+try:
+    secret_doc = db.collection(os.environ["ASSISTANT_ID"]).document("secrets").get()
+    if secret_doc.exists:
+        os.environ["API_KEY"] = secret_doc.to_dict().get("api_key", "")
+        print("API Key successfully retrieved and set.")
+    else:
+        raise ValueError("Secrets document does not exist.")
+except Exception as e:
+    print(f"Error retrieving secret: {e}")
+
+api_key = os.getenv("API_KEY")
+
+# print in docker logs
+print(f"API Key: {api_key if api_key else 'Not set'}")
+
+genai.configure(api_key=api_key)
 app = Flask(__name__)
 
 # Configure the API key
