@@ -18,7 +18,7 @@ def get_secret(secret_id):
 #api_key = get_secret("OPTI_REQ_API_KEY")
 
 if not os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "superhero-04-04.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "superhero-04-04.json" # json file with gc credentials. Should not be public to everyone so didnt upload to git. Dont know where to store it without the secrets 
 
 os.environ["ASSISTANT_ID"] = "superhero-04-04"
 
