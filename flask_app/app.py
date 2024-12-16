@@ -7,43 +7,30 @@ from io import StringIO
 
 app = Flask(__name__)
 
-def get_secret(secret_id):
+if not os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "superhero-04-04.json"
+
+def get_secret():
+    # Create the Secret Manager client
     client = secretmanager.SecretManagerServiceClient()
-    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
-    secret_name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+
+    # Define the secret name (ensure it matches your configuration)
+    secret_name = "projects/150699885662/secrets/superhero-04-04-secret/versions/latest"
+
+    # Access the secret version
     response = client.access_secret_version(name=secret_name)
     return response.payload.data.decode("UTF-8")
 
 # Retrieve the API key from Secret Manager
-#api_key = get_secret("OPTI_REQ_API_KEY")
+api_key = get_secret()
 
-if not os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "superhero-04-04.json" # json file with gc credentials. Should not be public to everyone so didnt upload to git. Dont know where to store it without the secrets 
-
-os.environ["ASSISTANT_ID"] = "superhero-04-04"
-
-db = firestore.Client()
-
-try:
-    secret_doc = db.collection(os.environ["ASSISTANT_ID"]).document("secrets").get()
-    if secret_doc.exists:
-        os.environ["API_KEY"] = secret_doc.to_dict().get("api_key", "")
-        print("API Key successfully retrieved and set.")
-    else:
-        raise ValueError("Secrets document does not exist.")
-except Exception as e:
-    print(f"Error retrieving secret: {e}")
-
-api_key = os.getenv("API_KEY")
+os.environ.pop("GOOGLE_APPLICATION_CREDENTIALS", None)
 
 # print in docker logs
 print(f"API Key: {api_key if api_key else 'Not set'}")
 
 genai.configure(api_key=api_key)
 app = Flask(__name__)
-
-# Configure the API key
-genai.configure(api_key=os.getenv('API_KEY'))
 
 def unmark_element(element, stream=None):
     if stream is None:
